@@ -1,29 +1,26 @@
 import { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LogOut, Menu, Bell } from 'lucide-react';
+import { LogOut, Bell, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Navbar = ({ toggleSidebar }) => {
+const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
-    <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10 md:ml-64">
-      <div className="flex items-center justify-between h-full px-6">
+    <header className="h-16 bg-white/70 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
+      <div className="flex items-center justify-between h-full px-4 md:px-8">
         <div className="flex items-center">
-          <button
-            onClick={toggleSidebar}
-            className="p-2 md:hidden text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors mr-2"
-          >
-            <Menu size={20} />
-          </button>
-          <div className="hidden md:block">
-            <h2 className="text-lg font-semibold text-slate-800">Welcome, {user?.name?.split(' ')[0]}</h2>
-          </div>
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <div className="bg-sky-600 p-1.5 rounded-lg shadow-sm shadow-sky-200">
+              <span className="block w-4 h-4 border-2 border-white rounded-sm"></span>
+            </div>
+            <h1 className="text-xl font-bold text-slate-900 font-display">TaskFlow</h1>
+          </Link>
         </div>
         
-        <div className="ml-auto flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-5">
           <div className="relative">
             <button 
               onClick={() => setShowNotifications(!showNotifications)}
@@ -35,10 +32,7 @@ const Navbar = ({ toggleSidebar }) => {
             
             {showNotifications && (
               <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setShowNotifications(false)}
-                ></div>
+                <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
                 <motion.div 
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -48,34 +42,25 @@ const Navbar = ({ toggleSidebar }) => {
                     <h3 className="text-sm font-bold text-slate-800">Notifications</h3>
                     <span className="text-xs font-semibold bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">New</span>
                   </div>
-                  <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto">
-                    <div className="p-4 hover:bg-slate-50 transition-colors cursor-pointer">
-                      <p className="text-sm text-slate-800 font-medium">Welcome to Team Task Manager!</p>
-                      <p className="text-xs text-slate-500 mt-1">Your premium workspace is ready. Start by creating a project.</p>
-                      <span className="text-[10px] font-semibold text-slate-400 mt-2 block">Just now</span>
+                  <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto p-2">
+                    <div className="p-3 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer">
+                      <p className="text-sm text-slate-800 font-medium">Welcome to TaskFlow!</p>
+                      <p className="text-xs text-slate-500 mt-1">Your premium dashboard is now ready.</p>
                     </div>
-                  </div>
-                  <div className="p-3 border-t border-slate-100 text-center">
-                    <button 
-                      onClick={() => setShowNotifications(false)}
-                      className="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors"
-                    >
-                      Mark all as read
-                    </button>
                   </div>
                 </motion.div>
               </>
             )}
           </div>
 
-          <div className="h-6 w-px bg-slate-200"></div>
+          <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
 
-          <Link to="/settings" className="flex items-center gap-3 cursor-pointer group">
+          <Link to="/settings" className="flex items-center gap-3 group">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-slate-700 leading-none">{user?.name}</p>
-              <p className="text-xs text-slate-500 mt-1 capitalize">{user?.role}</p>
+              <p className="text-sm font-bold text-slate-800 leading-none group-hover:text-sky-600 transition-colors">{user?.name}</p>
+              <p className="text-[10px] text-slate-500 mt-1 font-bold uppercase tracking-wider">{user?.role}</p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white group-hover:ring-sky-100 transition-all">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-md ring-2 ring-white transition-all group-hover:scale-105">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
           </Link>

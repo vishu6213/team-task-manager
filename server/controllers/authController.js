@@ -158,20 +158,22 @@ export const updateUserRole = async (req, res) => {
 // @access  Private/Admin
 export const deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const userId = req.params.id;
+
+    // Prevent admin from deleting themselves
+    if (userId === req.user._id.toString()) {
+      return res.status(400).json({ message: 'You cannot delete your own admin account' });
+    }
+
+    const user = await User.findByIdAndDelete(userId);
 
     if (user) {
-      // Prevent admin from deleting themselves
-      if (user._id.toString() === req.user._id.toString()) {
-        return res.status(400).json({ message: 'You cannot delete your own admin account' });
-      }
-
-      await User.deleteOne({ _id: user._id });
-      res.json({ message: 'User removed' });
+      res.json({ message: 'User successfully removed from the system' });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found or already removed' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Delete user error:', error);
+    res.status(500).json({ message: 'Internal server error while removing user' });
   }
 };
