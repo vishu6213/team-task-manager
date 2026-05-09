@@ -6,17 +6,17 @@ import generateToken from '../utils/generateToken.js';
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-
-    const userExists = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase();
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
+      console.log('Registration failed: User already exists -', normalizedEmail);
       return res.status(400).json({ message: 'User already exists' });
     }
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       role: role || 'member',
     });
@@ -42,11 +42,12 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase();
+    console.log('Login attempt for:', normalizedEmail);
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (user && (await user.matchPassword(password))) {
+      console.log('Login successful for:', normalizedEmail);
       res.json({
         _id: user._id,
         name: user.name,
@@ -55,9 +56,11 @@ export const loginUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
+      console.log('Login failed: Invalid credentials for -', normalizedEmail);
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
+    console.error('Login error:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
