@@ -6,6 +6,7 @@ import generateToken from '../utils/generateToken.js';
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
+    const { name, email, password, role } = req.body;
     const normalizedEmail = email.toLowerCase();
     const userExists = await User.findOne({ email: normalizedEmail });
 
@@ -42,6 +43,7 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
+    const { email, password } = req.body;
     const normalizedEmail = email.toLowerCase();
     console.log('Login attempt for:', normalizedEmail);
     const user = await User.findOne({ email: normalizedEmail });
