@@ -22,9 +22,12 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    // Allow all origins for now to resolve connectivity issues
+    callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   credentials: true
 }));
 app.use(express.json());
