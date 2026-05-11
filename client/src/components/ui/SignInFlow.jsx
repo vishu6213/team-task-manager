@@ -200,10 +200,10 @@ export const CanvasRevealEffect = ({
 
 const AnimatedNavLink = ({ to, children }) => {
   return (
-    <Link to={to} className="group relative inline-block overflow-hidden h-5 flex items-center text-sm">
-      <div className="flex flex-col transition-transform duration-400 ease-out transform group-hover:-translate-y-1/2">
-        <span className="text-gray-300">{children}</span>
-        <span className="text-white">{children}</span>
+    <Link to={to} className="group relative inline-block overflow-hidden h-6 text-sm">
+      <div className="flex flex-col transition-transform duration-500 ease-in-out transform group-hover:-translate-y-1/2">
+        <span className="text-gray-300 h-6 flex items-center">{children}</span>
+        <span className="text-white h-6 flex items-center">{children}</span>
       </div>
     </Link>
   );
