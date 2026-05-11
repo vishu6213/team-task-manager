@@ -17,6 +17,15 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+// Validate environment variables
+const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
+requiredEnv.forEach(env => {
+  if (!process.env[env]) {
+    console.error(`FATAL ERROR: ${env} is not defined in environment variables.`);
+    process.exit(1);
+  }
+});
+
 connectDB();
 
 const app = express();

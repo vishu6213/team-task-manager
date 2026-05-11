@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Team Task Manager
 
 A complete, production-ready full-stack MERN application for managing team projects and tasks.
@@ -36,64 +35,63 @@ A complete, production-ready full-stack MERN application for managing team proje
 
 ## Installation & Setup
 
-1. **Clone the repository** (if applicable) or navigate to the project directory.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/vishu6213/team-task-manager.git
+   cd team-task-manager
+   ```
 
-2. **Backend Setup**
+2. **Root Dependencies**
+   Install dependencies for both client and server from the root:
+   ```bash
+   npm install
+   ```
+
+3. **Backend Setup**
    ```bash
    cd server
-   npm install
-   cp .env.example .env
+   # Create .env file with:
+   # MONGO_URI=your_mongodb_connection_string
+   # JWT_SECRET=your_secret_key
    ```
-   *Edit `.env` and add your `MONGO_URI` and `JWT_SECRET`.*
 
-3. **Frontend Setup**
+4. **Frontend Setup**
    ```bash
    cd client
-   npm install
-   cp .env.example .env
+   # (Optional) Create .env file for custom API URL
+   # VITE_API_URL=http://localhost:5000/api
    ```
-   *The default `VITE_API_URL` is set to `http://localhost:5000/api`.*
 
 ## Running Locally
 
-Open two terminal windows/tabs:
+You can run the whole app from the root directory:
 
-**Terminal 1 (Backend):**
 ```bash
-cd server
-npm run dev
-```
-
-**Terminal 2 (Frontend):**
-```bash
-cd client
-npm run dev
+# Start both server and client (if concurrently is installed) or run separately:
+npm run dev --prefix server
+npm run dev --prefix client
 ```
 
 The frontend will be accessible at `http://localhost:5173` and the backend at `http://localhost:5000`.
 
-## Environment Variables
-
-### Backend (`server/.env`)
-```
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-CLIENT_URL=http://localhost:5173
-NODE_ENV=development
-```
-
-### Frontend (`client/.env`)
-```
-VITE_API_URL=http://localhost:5000/api
-```
-
 ## Deployment
 
-This application is ready to be deployed on platforms like **Railway** and **Vercel**.
+This application is optimized for **Vercel** (Frontend) and **Render/Railway** (Backend).
 
-1. **Backend (Railway)**: Deploy the `server` folder. Set the environment variables in the Railway dashboard.
-2. **Frontend (Vercel/Railway)**: Deploy the `client` folder. Set the Build Command to `npm run build` and Output Directory to `dist`. Add `VITE_API_URL` pointing to your deployed backend URL.
-=======
-# team-task-manager
->>>>>>> 3fae236e1d7440f7706a899c7f3d28c2e9075b61
+### Production Configuration
+The application automatically detects its environment. When deployed on Vercel, it defaults to the production backend:
+`https://team-task-manager-ag7w.onrender.com/api`
+
+To override this, set the `VITE_API_URL` environment variable in your Vercel/Render dashboard.
+
+### Environment Variables
+
+#### Backend (`server/.env`)
+- `PORT`: 5000
+- `MONGO_URI`: Your MongoDB string
+- `JWT_SECRET`: Your secret key
+- `CLIENT_URL`: Your frontend URL (or `*` for all)
+- `NODE_ENV`: production
+
+#### Frontend (Vercel Settings)
+- `VITE_API_URL`: Your deployed backend URL
