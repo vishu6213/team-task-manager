@@ -56,11 +56,11 @@ export const loginUser = async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    console.log('Login attempt for:', normalizedEmail);
+    console.log(`[AUTH] Login attempt: ${normalizedEmail}`);
     const user = await User.findOne({ email: normalizedEmail });
 
     if (user && (await user.matchPassword(password))) {
-      console.log('Login successful for:', normalizedEmail);
+      console.log(`[AUTH] Login success: ${normalizedEmail}`);
       res.json({
         _id: user._id,
         name: user.name,
@@ -69,7 +69,7 @@ export const loginUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      console.log('Login failed: Invalid credentials for -', normalizedEmail);
+      console.warn(`[AUTH] Login failed: Invalid credentials for ${normalizedEmail}`);
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {

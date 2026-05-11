@@ -33,28 +33,41 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const normalizedEmail = email.trim().toLowerCase();
+      const { data } = await api.post('/auth/login', { email: normalizedEmail, password });
       const { token, ...userData } = data;
       localStorage.setItem('token', token);
       setUser(userData);
       toast.success('Logged in successfully');
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      console.error('Login error:', error);
+      const message = error.response?.data?.message || 
+                     (error.code === 'ERR_NETWORK' ? 'Server unreachable. Please check your connection.' : 'Login failed');
+      toast.error(message);
       return false;
     }
   };
 
   const register = async (name, email, password, role) => {
     try {
-      const { data } = await api.post('/auth/register', { name, email, password, role });
+      const normalizedEmail = email.trim().toLowerCase();
+      const { data } = await api.post('/auth/register', { 
+        name: name.trim(), 
+        email: normalizedEmail, 
+        password, 
+        role 
+      });
       const { token, ...userData } = data;
       localStorage.setItem('token', token);
       setUser(userData);
       toast.success('Registered successfully');
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', error);
+      const message = error.response?.data?.message || 
+                     (error.code === 'ERR_NETWORK' ? 'Server unreachable. Please check your connection.' : 'Registration failed');
+      toast.error(message);
       return false;
     }
   };

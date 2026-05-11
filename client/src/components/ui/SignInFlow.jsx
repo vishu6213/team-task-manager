@@ -259,13 +259,14 @@ export const SignInPage = ({ type = "login" }) => {
   const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
   const [showPreloader, setShowPreloader] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user && !showPreloader) {
+    if (user && !showPreloader && !isRedirecting) {
       navigate('/dashboard');
     }
-  }, [user, navigate, showPreloader]);
+  }, [user, navigate, showPreloader, isRedirecting]);
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -294,6 +295,7 @@ export const SignInPage = ({ type = "login" }) => {
     }
 
     if (success) {
+      setIsRedirecting(true);
       setReverseCanvasVisible(true);
       const timer1 = setTimeout(() => setInitialCanvasVisible(false), 50);
       // Wait for a brief moment of the reverse canvas effect, then start preloader
