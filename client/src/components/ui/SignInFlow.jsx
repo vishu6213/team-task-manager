@@ -5,14 +5,13 @@ import { cn } from "../../lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { AuthContext } from "../../context/AuthContext";
-import { CheckSquare, Eye, EyeOff, Mail, Lock, User, Briefcase, ArrowRight, LayoutDashboard } from "lucide-react";
+import { CheckSquare, Eye, EyeOff, Mail, ArrowRight } from "lucide-react";
 
 // --- Shader Components (Provided by user) ---
 
 const ShaderMaterial = ({
   source,
   uniforms,
-  maxFps = 60,
 }) => {
   const { size } = useThree();
   const ref = useRef(null);
@@ -210,7 +209,6 @@ const AnimatedNavLink = ({ to, children }) => {
 };
 
 function MiniNavbar() {
-  const [headerShapeClass, setHeaderShapeClass] = useState('rounded-full');
   const logoElement = (
     <Link to="/" className="relative w-5 h-5 flex items-center justify-center">
       <span className="absolute w-1.5 h-1.5 rounded-full bg-gray-200 top-0 left-1/2 transform -translate-x-1/2 opacity-80"></span>
@@ -222,8 +220,7 @@ function MiniNavbar() {
 
   return (
     <header className={cn(
-      "fixed top-6 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center pl-6 pr-6 py-3 backdrop-blur-sm border border-[#333] bg-[#1f1f1f57] w-[calc(100%-2rem)] sm:w-auto transition-[border-radius] duration-300",
-      headerShapeClass
+      "fixed top-6 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center pl-6 pr-6 py-3 backdrop-blur-sm border border-[#333] bg-[#1f1f1f57] w-[calc(100%-2rem)] sm:w-auto rounded-full transition-[border-radius] duration-300"
     )}>
       <div className="flex items-center justify-between w-full gap-x-6 sm:gap-x-8">
         <div className="flex items-center">{logoElement}</div>
@@ -282,7 +279,7 @@ export const SignInPage = ({ type = "login" }) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    let success = false;
+    let success;
     try {
       if (type === "login") {
         success = await login(formData.email, formData.password);
