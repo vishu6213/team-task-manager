@@ -245,7 +245,7 @@ import Preloader from "./Preloader";
 
 export const SignInPage = ({ type = "login" }) => {
   const navigate = useNavigate();
-  const { login, register } = useContext(AuthContext);
+  const { user, login, register } = useContext(AuthContext);
   
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -259,6 +259,13 @@ export const SignInPage = ({ type = "login" }) => {
   const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
   const [showPreloader, setShowPreloader] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user && !showPreloader) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate, showPreloader]);
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -275,21 +282,33 @@ export const SignInPage = ({ type = "login" }) => {
     setIsSubmitting(true);
     
     let success = false;
-    if (type === "login") {
-      success = await login(formData.email, formData.password);
-    } else {
-      success = await register(formData.name, formData.email, formData.password, formData.role);
+    try {
+      if (type === "login") {
+        success = await login(formData.email, formData.password);
+      } else {
+        success = await register(formData.name, formData.email, formData.password, formData.role);
+      }
+    } catch (err) {
+      console.error("Auth action failed:", err);
+      success = false;
     }
 
     if (success) {
       setReverseCanvasVisible(true);
-      setTimeout(() => setInitialCanvasVisible(false), 50);
+      const timer1 = setTimeout(() => setInitialCanvasVisible(false), 50);
       // Wait for a brief moment of the reverse canvas effect, then start preloader
-      setTimeout(() => {
+      const timer2 = setTimeout(() => {
         setShowPreloader(true);
+        setIsSubmitting(false);
       }, 1000);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    } else {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const handlePreloaderComplete = () => {
@@ -440,20 +459,35 @@ export const SignInPage = ({ type = "login" }) => {
                       )
                     )}
 
-                    <button 
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="mt-8 w-full bg-white text-black font-bold py-4 rounded-full hover:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          {step === (type === "login" ? 2 : 3) ? (type === "login" ? "Sign In" : "Register") : "Continue"}
-                          <ArrowRight size={20} />
-                        </>
+                    <div className="flex gap-4 mt-8">
+                      {step > 1 && (
+                        <button 
+                          type="button"
+                          onClick={() => setStep(step - 1)}
+                          disabled={isSubmitting}
+                          className="flex-1 bg-white/10 text-white font-bold py-4 rounded-full hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        >
+                          Back
+                        </button>
                       )}
-                    </button>
+                      <button 
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={cn(
+                          "w-full bg-white text-black font-bold py-4 rounded-full hover:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-2",
+                          step > 1 ? "flex-[2]" : "w-full"
+                        )}
+                      >
+                        {isSubmitting ? (
+                          <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            {step === (type === "login" ? 2 : 3) ? (type === "login" ? "Sign In" : "Register") : "Continue"}
+                            <ArrowRight size={20} />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </form>
 

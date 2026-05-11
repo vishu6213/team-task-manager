@@ -7,34 +7,40 @@ import generateToken from '../utils/generateToken.js';
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    const normalizedEmail = email.toLowerCase();
-    const userExists = await User.findOne({ email: normalizedEmail });
 
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Please provide all required fields (name, email, password)' });
+    }
+
+    const trimmedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Check if user already exists
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
-      console.log('Registration failed: User already exists -', normalizedEmail);
       return res.status(400).json({ message: 'User already exists' });
     }
 
     const user = await User.create({
-      name,
+      name: trimmedName,
       email: normalizedEmail,
       password,
       role: role || 'member',
     });
 
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
-    }
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Registration error:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    res.status(400).json({ message: error.message || 'Error during registration' });
   }
 };
 
@@ -44,7 +50,12 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const normalizedEmail = email.toLowerCase();
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Please provide both email and password' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
     console.log('Login attempt for:', normalizedEmail);
     const user = await User.findOne({ email: normalizedEmail });
 
@@ -63,7 +74,7 @@ export const loginUser = async (req, res) => {
     }
   } catch (error) {
     console.error('Login error:', error.message);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Internal server error during login' });
   }
 };
 

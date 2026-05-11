@@ -16,9 +16,14 @@ export const AuthProvider = ({ children }) => {
           const { data } = await api.get('/auth/me');
           setUser(data);
         } catch (error) {
-          console.error(error);
-          localStorage.removeItem('token');
-          setUser(null);
+          console.error('Session recovery error:', error);
+          // Only clear token if it's a confirmed authentication error (401)
+          if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token');
+            setUser(null);
+          }
+          // For other errors (like network issues), we keep the token and 
+          // potentially try again on next mount or just let protected routes handle it.
         }
       }
       setLoading(false);
@@ -29,8 +34,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      localStorage.setItem('token', data.token);
-      setUser(data);
+      const { token, ...userData } = data;
+      localStorage.setItem('token', token);
+      setUser(userData);
       toast.success('Logged in successfully');
       return true;
     } catch (error) {
@@ -42,8 +48,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password, role) => {
     try {
       const { data } = await api.post('/auth/register', { name, email, password, role });
-      localStorage.setItem('token', data.token);
-      setUser(data);
+      const { token, ...userData } = data;
+      localStorage.setItem('token', token);
+      setUser(userData);
       toast.success('Registered successfully');
       return true;
     } catch (error) {
