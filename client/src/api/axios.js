@@ -3,17 +3,18 @@ import axios from 'axios';
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   
-  // Dynamic fallback: If we are on Vercel/Production, use the Render API
-  if (typeof window !== 'undefined' && 
-      (window.location.hostname.includes('vercel.app') || !window.location.hostname.includes('localhost'))) {
-    return 'https://team-task-manager-ag7w.onrender.com/api';
+  // Use localhost ONLY if we are in Vite development mode AND on a local hostname
+  if (import.meta.env.DEV && window.location.hostname === 'localhost') {
+    return 'http://localhost:5000/api';
   }
   
-  return 'http://localhost:5000/api';
+  // Default to production Render API
+  return 'https://team-task-manager-ag7w.onrender.com/api';
 };
 
 const api = axios.create({
   baseURL: getBaseURL(),
+  timeout: 30000, // 30 seconds for Render free tier wake-up
 });
 
 // Debug log for API URL
@@ -28,7 +29,21 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Connectivity Error:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+      baseURL: error.config?.baseURL
+    });
     return Promise.reject(error);
   }
 );
