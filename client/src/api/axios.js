@@ -1,14 +1,20 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_URL;
+  const isLocalPage = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  // If we have an ENV URL and it's either not localhost OR we are actually on a local page
+  if (envUrl && (!envUrl.includes('localhost') || isLocalPage)) {
+    return envUrl;
+  }
   
-  // Use localhost ONLY if we are in Vite development mode AND on a local hostname
-  if (import.meta.env.DEV && window.location.hostname === 'localhost') {
+  // If we are on a local page and in dev mode, default to local server
+  if (isLocalPage && import.meta.env.DEV) {
     return 'http://localhost:5000/api';
   }
   
-  // Default to production Render API
+  // Default to production Render API for all other cases (especially Vercel production)
   return 'https://team-task-manager-ag7w.onrender.com/api';
 };
 

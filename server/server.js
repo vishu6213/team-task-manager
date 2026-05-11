@@ -43,6 +43,10 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
+app.get('/api', (req, res) => {
+  res.send('API is running at /api...');
+});
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
